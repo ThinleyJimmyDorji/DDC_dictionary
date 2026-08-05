@@ -8,6 +8,7 @@
 .buildlog/
 .history
 .svn/
+.cursor/
 
 # IntelliJ related
 *.iml
@@ -15,10 +16,8 @@
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# VS Code / Cursor
+.vscode/
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -29,9 +28,29 @@
 .pub-cache/
 .pub/
 /build/
+.metadata
 
-# Web related
+# Platform build artifacts
+ios/Flutter/ephemeral/
+ios/Pods/
+ios/.symlinks/
+android/.gradle/
+android/app/build/
+macos/Flutter/ephemeral/
+macos/Pods/
+
+# Generated plugin registrants
 lib/generated_plugin_registrant.dart
+macos/Flutter/GeneratedPluginRegistrant.swift
+
+# Not supported build targets for this app -- only Android, iOS, and macOS
+# (kept for local desktop dev/testing) are. These were added by `flutter
+# create .` regenerating every platform target; excluded rather than
+# deleted in case that changes later. Run `flutter create .
+# --platforms=windows` (etc.) to regenerate if ever needed.
+/windows/
+/linux/
+/web/
 
 # Symbolication related
 app.*.symbols
