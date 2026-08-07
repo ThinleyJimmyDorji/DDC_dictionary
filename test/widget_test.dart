@@ -48,9 +48,8 @@ void main() {
     expect(find.text('Search Dzongkha or English...'), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
 
-    // Bottom nav has all three destinations.
+    // Bottom nav has both destinations.
     expect(find.text('Search'), findsOneWidget);
-    expect(find.text('Favorites'), findsOneWidget);
     expect(find.text('Settings'), findsOneWidget);
   });
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'favorites_tab.dart';
+import '../widgets/app_bottom_nav.dart';
 import 'search_tab.dart';
 import 'settings_tab.dart';
 
@@ -16,26 +16,31 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _index = 0;
 
-  static const _tabs = [SearchTab(), FavoritesTab(), SettingsTab()];
+  static const _tabs = [SearchTab(), SettingsTab()];
+
+  static const _destinations = [
+    AppNavDestination(
+        icon: Icons.search_outlined,
+        selectedIcon: Icons.search,
+        label: 'Search'),
+    AppNavDestination(
+      icon: Icons.tune_outlined,
+      selectedIcon: Icons.tune,
+      label: 'Settings',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
+        bottom: false,
         child: IndexedStack(index: _index, children: _tabs),
       ),
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: AppBottomNav(
+        destinations: _destinations,
         selectedIndex: _index,
-        onDestinationSelected: (value) => setState(() => _index = value),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.search), label: 'Search'),
-          NavigationDestination(
-            icon: Icon(Icons.favorite_border),
-            selectedIcon: Icon(Icons.favorite),
-            label: 'Favorites',
-          ),
-          NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
-        ],
+        onSelect: (value) => setState(() => _index = value),
       ),
     );
   }

@@ -11,9 +11,11 @@ class SettingsState {
     required this.fontScale,
   });
 
-  static const initial = SettingsState(themeMode: ThemeMode.system, fontScale: 1.0);
+  static const initial =
+      SettingsState(themeMode: ThemeMode.system, fontScale: 1.0);
 
-  SettingsState copyWith({ThemeMode? themeMode, double? fontScale}) => SettingsState(
+  SettingsState copyWith({ThemeMode? themeMode, double? fontScale}) =>
+      SettingsState(
         themeMode: themeMode ?? this.themeMode,
         fontScale: fontScale ?? this.fontScale,
       );
@@ -39,7 +41,9 @@ class SettingsController extends StateNotifier<SettingsState> {
     final fontScale = prefs.getDouble(_fontScaleKey);
 
     state = SettingsState(
-      themeMode: (themeIndex != null && themeIndex >= 0 && themeIndex < ThemeMode.values.length)
+      themeMode: (themeIndex != null &&
+              themeIndex >= 0 &&
+              themeIndex < ThemeMode.values.length)
           ? ThemeMode.values[themeIndex]
           : ThemeMode.system,
       fontScale: fontScale ?? 1.0,
@@ -60,6 +64,7 @@ class SettingsController extends StateNotifier<SettingsState> {
   }
 }
 
-final settingsControllerProvider = StateNotifierProvider<SettingsController, SettingsState>((ref) {
+final settingsControllerProvider =
+    StateNotifierProvider<SettingsController, SettingsState>((ref) {
   return SettingsController();
 });

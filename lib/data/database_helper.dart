@@ -11,10 +11,11 @@ import 'package:sqflite/sqflite.dart';
 /// Filename is deliberately different from the old app's `dzoDZO.db`: if
 /// someone upgrades in place from the old app, we don't want to accidentally
 /// pick up a stale copy with the old schema (no indexes, no FTS tables, no
-/// favorites/history/meta). A new filename guarantees a clean install of the
-/// new schema regardless of upgrade path.
+/// history/meta). A new filename guarantees a clean install of the new
+/// schema regardless of upgrade path.
 class DatabaseHelper {
-  DatabaseHelper._({Directory? directoryOverride}) : _directoryOverride = directoryOverride;
+  DatabaseHelper._({Directory? directoryOverride})
+      : _directoryOverride = directoryOverride;
   static final DatabaseHelper instance = DatabaseHelper._();
 
   /// For widget/unit tests: `path_provider` is a platform-channel plugin
@@ -63,7 +64,8 @@ class DatabaseHelper {
   }
 
   Future<Database> _openNative() async {
-    final baseDir = _directoryOverride ?? await getApplicationSupportDirectory();
+    final baseDir =
+        _directoryOverride ?? await getApplicationSupportDirectory();
     final dbPath = p.join(baseDir.path, _dbFileName);
 
     if (!await databaseExists(dbPath)) {

@@ -39,34 +39,7 @@ void main() {
     });
   });
 
-  group('DictionaryEntry.fromFavoriteRow', () {
-    test('maps the favorites table row shape back to an entry', () {
-      final entry = DictionaryEntry.fromFavoriteRow({
-        'source': 'en_dz',
-        'entry_id': 42,
-        'headword': 'aardvark',
-        'pos': 'noun',
-        'definition': 'གྱོག་དོམ།',
-        'created_at': 1700000000000,
-      });
-
-      expect(entry.id, 42);
-      expect(entry.source, DictionarySource.enDz);
-      expect(entry.headword, 'aardvark');
-    });
-  });
-
   group('identity', () {
-    test('favoriteKey combines table name and id', () {
-      final entry = DictionaryEntry.fromRow(DictionarySource.enDz, {
-        'id': 7,
-        'keyword': 'word',
-        'pos': 'noun',
-        'definition': 'x',
-      });
-      expect(entry.favoriteKey, 'en_dz:7');
-    });
-
     test('equality/hashCode are based on (source, id), not content', () {
       final a = DictionaryEntry.fromRow(DictionarySource.enDz, {
         'id': 7,

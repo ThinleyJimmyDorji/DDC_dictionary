@@ -5,7 +5,7 @@ import '../models/dictionary_source.dart';
 import 'database_helper.dart';
 
 /// All reads/writes against the dictionary database go through here --
-/// searching, favorites, history, and the word of the day.
+/// searching, history, and the word of the day.
 ///
 /// Search strategy: detect whether the query is Dzongkha (Tibetan script)
 /// or Latin script, then try an indexed prefix match on the headword first
@@ -22,7 +22,8 @@ class DictionaryRepository {
 
   bool _looksLikeDzongkha(String text) => _tibetanScriptPattern.hasMatch(text);
 
-  Future<List<DictionaryEntry>> search(String rawQuery, {int limit = 40}) async {
+  Future<List<DictionaryEntry>> search(String rawQuery,
+      {int limit = 40}) async {
     final query = rawQuery.trim();
     if (query.isEmpty) return const [];
 
@@ -92,74 +93,37 @@ class DictionaryRepository {
   /// that isn't a word character or Tibetan script, then request a prefix
   /// match on the (last) term so partial typing still finds results.
   String _sanitizeFtsQuery(String query) {
-    final cleaned =
-        query.replaceAll(RegExp(r'[^\wༀ-࿿\s]'), ' ').trim();
+    final cleaned = query.replaceAll(RegExp(r'[^\wༀ-࿿\s]'), ' ').trim();
     if (cleaned.isEmpty) return '';
     return '$cleaned*';
   }
 
   /// Deterministic "word of the day" -- same word all day, changes daily,
   /// no network/server needed.
-  Future<DictionaryEntry?> wordOfTheDay() async {
+  ///
+  /// [offset] steps forward through the dictionary from that day's word,
+  /// wrapping around -- what powers the "next word" action, without
+  /// needing a server or a stored history of what's already been shown.
+  Future<DictionaryEntry?> wordOfTheDay({int offset = 0}) async {
     final db = await _dbHelper.database;
     const source = DictionarySource.dzEn;
-    final countRows = await db.rawQuery('SELECT COUNT(*) AS c FROM ${source.table}');
+    final countRows =
+        await db.rawQuery('SELECT COUNT(*) AS c FROM ${source.table}');
     final count = countRows.first['c'] as int;
     if (count == 0) return null;
 
     final today = DateTime.now();
     final seed = today.year * 10000 + today.month * 100 + today.day;
-    final targetId = (seed % count) + 1;
+    final targetId = ((seed + offset) % count) + 1;
 
-    var rows = await db.query(source.table, where: 'id = ?', whereArgs: [targetId], limit: 1);
+    var rows = await db.query(source.table,
+        where: 'id = ?', whereArgs: [targetId], limit: 1);
     if (rows.isEmpty) {
       // Id gaps shouldn't exist after migration, but don't crash if they do.
       rows = await db.query(source.table, limit: 1, offset: seed % count);
     }
     if (rows.isEmpty) return null;
     return DictionaryEntry.fromRow(source, rows.first);
-  }
-
-  Future<bool> isFavorite(DictionaryEntry entry) async {
-    final db = await _dbHelper.database;
-    final rows = await db.query(
-      'favorites',
-      where: 'source = ? AND entry_id = ?',
-      whereArgs: [entry.source.table, entry.id],
-      limit: 1,
-    );
-    return rows.isNotEmpty;
-  }
-
-  Future<void> addFavorite(DictionaryEntry entry) async {
-    final db = await _dbHelper.database;
-    await db.insert(
-      'favorites',
-      {
-        'source': entry.source.table,
-        'entry_id': entry.id,
-        'headword': entry.headword,
-        'pos': entry.pos,
-        'definition': entry.definition,
-        'created_at': DateTime.now().millisecondsSinceEpoch,
-      },
-      conflictAlgorithm: ConflictAlgorithm.ignore,
-    );
-  }
-
-  Future<void> removeFavorite(DictionaryEntry entry) async {
-    final db = await _dbHelper.database;
-    await db.delete(
-      'favorites',
-      where: 'source = ? AND entry_id = ?',
-      whereArgs: [entry.source.table, entry.id],
-    );
-  }
-
-  Future<List<DictionaryEntry>> getFavorites() async {
-    final db = await _dbHelper.database;
-    final rows = await db.query('favorites', orderBy: 'created_at DESC');
-    return rows.map(DictionaryEntry.fromFavoriteRow).toList();
   }
 
   Future<void> addHistory(String query) async {
@@ -184,7 +148,8 @@ class DictionaryRepository {
 
   Future<List<String>> getRecentHistory({int limit = 10}) async {
     final db = await _dbHelper.database;
-    final rows = await db.query('history', orderBy: 'searched_at DESC', limit: limit);
+    final rows =
+        await db.query('history', orderBy: 'searched_at DESC', limit: limit);
     return rows.map((row) => row['query'] as String).toList();
   }
 

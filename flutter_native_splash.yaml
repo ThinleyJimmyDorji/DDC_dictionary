@@ -1,4 +1,17 @@
 flutter_native_splash:
-  image: assets/dzo.png
-  color: "42a5f5"
-  android_disable_fullscreen: true
+  # Matches AppColors.light/dark in lib/theme/app_theme.dart -- previously
+  # this used a stock Material blue background with an unrelated photo
+  # asset (assets/dzo.png, the "how to type Dzongkha" credit image), which
+  # had nothing to do with the app's actual branding.
+  color: "FBF7F2"
+  color_dark: "15110D"
+  image: assets/logo.png
+  image_dark: assets/logo.png
+
+  android_12:
+    color: "FBF7F2"
+    color_dark: "15110D"
+    image: assets/logo.png
+    image_dark: assets/logo.png
+
+  fullscreen: false
